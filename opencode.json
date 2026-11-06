@@ -1,0 +1,316 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "instructions": ["AGENTS.md"],
+  "tools": {
+    "bash": true,
+    "read": true,
+    "glob": true,
+    "grep": true,
+    "edit": true,
+    "write": true,
+    "task": true,
+    "webfetch": true,
+    "todowrite": true,
+    "question": true
+  },
+  "permission": {
+    // secrets and credential material — never read
+    "read": {
+      "*": "allow",
+      ".env": "deny",
+      ".env.*": "deny",
+      "**/*.env": "deny",
+      "**/terraform.tfvars": "deny",
+      "**/terraform.tfvars.*": "deny",
+      "**/terraform.tfstate": "deny",
+      "**/terraform.tfstate.*": "deny",
+      "**/secrets/**": "deny",
+      "**/credentials.json": "deny",
+      "**/*.pem": "deny",
+      "**/*.key": "deny",
+      "**/*.p12": "deny",
+      "**/*.pfx": "deny",
+      "**/id_rsa*": "deny",
+      "**/id_ed25519*": "deny",
+      "**/.npmrc": "deny",
+      "**/.pgpass": "deny",
+      "**/.netrc": "deny",
+      // node (node_modules, npm/yarn/pnpm caches)
+      "**/node_modules/**": "deny",
+      "**/.npm/**": "deny",
+      "**/AppData/Local/Yarn/**": "deny",
+      "**/AppData/Local/pnpm/**": "deny",
+      // python (venvs, site-packages, pip cache)
+      "**/venv/**": "deny",
+      "**/.venv/**": "deny",
+      "**/site-packages/**": "deny",
+      "**/__pycache__/**": "deny",
+      "**/.cache/pip/**": "deny",
+      // go (module cache, vendored deps)
+      "**/pkg/mod/**": "deny",
+      "**/vendor/**": "deny",
+      // java (maven local repo, gradle caches)
+      "**/.m2/repository/**": "deny",
+      "**/.gradle/caches/**": "deny",
+      "**/.gradle/wrapper/**": "deny"
+    },
+    "edit": {
+      "*": "allow",
+      "**/dist/**": "deny",
+      "**/node_modules/**": "deny",
+      "**/.npm/**": "deny",
+      "**/AppData/Local/Yarn/**": "deny",
+      "**/AppData/Local/pnpm/**": "deny",
+      "**/venv/**": "deny",
+      "**/.venv/**": "deny",
+      "**/site-packages/**": "deny",
+      "**/__pycache__/**": "deny",
+      "**/.cache/pip/**": "deny",
+      "**/pkg/mod/**": "deny",
+      "**/vendor/**": "deny",
+      "**/.m2/repository/**": "deny",
+      "**/.gradle/caches/**": "deny",
+      "**/.gradle/wrapper/**": "deny"
+    },
+    "glob": {
+      "*": "allow",
+      "**/node_modules/**": "deny",
+      "**/.npm/**": "deny",
+      "**/AppData/Local/Yarn/**": "deny",
+      "**/AppData/Local/pnpm/**": "deny",
+      "**/venv/**": "deny",
+      "**/.venv/**": "deny",
+      "**/site-packages/**": "deny",
+      "**/__pycache__/**": "deny",
+      "**/.cache/pip/**": "deny",
+      "**/pkg/mod/**": "deny",
+      "**/vendor/**": "deny",
+      "**/.m2/repository/**": "deny",
+      "**/.gradle/caches/**": "deny",
+      "**/.gradle/wrapper/**": "deny"
+    },
+    "grep": {
+      "*": "allow",
+      "**/node_modules/**": "deny",
+      "**/.npm/**": "deny",
+      "**/AppData/Local/Yarn/**": "deny",
+      "**/AppData/Local/pnpm/**": "deny",
+      "**/venv/**": "deny",
+      "**/.venv/**": "deny",
+      "**/site-packages/**": "deny",
+      "**/__pycache__/**": "deny",
+      "**/.cache/pip/**": "deny",
+      "**/pkg/mod/**": "deny",
+      "**/vendor/**": "deny",
+      "**/.m2/repository/**": "deny",
+      "**/.gradle/caches/**": "deny",
+      "**/.gradle/wrapper/**": "deny"
+    },
+    "list": {
+      "*": "allow",
+      "**/node_modules/**": "deny",
+      "**/.npm/**": "deny",
+      "**/AppData/Local/Yarn/**": "deny",
+      "**/AppData/Local/pnpm/**": "deny",
+      "**/venv/**": "deny",
+      "**/.venv/**": "deny",
+      "**/site-packages/**": "deny",
+      "**/__pycache__/**": "deny",
+      "**/.cache/pip/**": "deny",
+      "**/pkg/mod/**": "deny",
+      "**/vendor/**": "deny",
+      "**/.m2/repository/**": "deny",
+      "**/.gradle/caches/**": "deny",
+      "**/.gradle/wrapper/**": "deny"
+    },
+    // destructive operations: broad ask rules first, narrow hard denies last
+    // (opencode evaluates the LAST matching rule)
+    "bash": {
+      "*": "allow",
+      "Remove-Item *": "ask",
+      "del *": "ask",
+      "rm *": "ask",
+      "git clean *": "ask",
+      "git checkout -- *": "ask",
+      "git checkout .": "ask",
+      "git restore *": "ask",
+      "git branch -D *": "ask",
+      "rm * -rf *": "deny",
+      "rm * -r *": "deny",
+      "rm -rf *": "deny",
+      "rm -r *": "deny",
+      "git push *": "deny",
+      "git push": "deny",
+      "git reset --hard *": "deny",
+      "git reset --hard": "deny"
+    },
+    "external_directory": {
+      "*": "ask",
+      "~/.m2/repository/**": "deny",
+      "~/.npm/**": "deny",
+      "~/AppData/Local/Yarn/**": "deny",
+      "~/AppData/Local/pnpm/**": "deny",
+      "~/AppData/Local/pip/**": "deny",
+      "~/.cache/pip/**": "deny",
+      "~/go/pkg/mod/**": "deny",
+      "~/.gradle/caches/**": "deny",
+      "~/.gradle/wrapper/**": "deny"
+    }
+  },
+  "mcp": {
+    "prisma-mcp-server": {
+      "type": "local",
+      "command": ["npx", "-y", "prisma", "mcp"],
+      "enabled": true
+    },
+    "sequential-thinking": {
+      "type": "local",
+      "command": ["npx", "-y", "@modelcontextprotocol/server-sequential-thinking"],
+      "enabled": true
+    },
+    "context7": {
+      "type": "local",
+      "command": ["npx", "-y", "@upstash/context7-mcp@2.0.2"],
+      "enabled": true
+    },
+    "serena": {
+      "type": "local",
+      "command": [
+        "uvx",
+        "--from",
+        "git+https://github.com/oraios/serena",
+        "serena",
+        "start-mcp-server",
+        "--context",
+        "claude-code"
+      ],
+      "enabled": true,
+      "timeout": 300000
+    },
+    "postgres-mcp": {
+      "type": "local",
+      "command": ["uvx", "postgres-mcp", "--access-mode=unrestricted"],
+      "enabled": true,
+      "environment": {
+        "DATABASE_URI": "postgresql://postgres:{env:POSTGRES_PASSWORD}@localhost:5432/postgres"
+      }
+    },
+    "go-mcp-mysql": {
+      "type": "local",
+      "command": [
+        "go-mcp-mysql.exe",
+        "--host", "localhost",
+        "--port", "3306",
+        "--user", "admin",
+        "--pass", "{env:MYSQL_PASSWORD}",
+        "--db", "icd-internal"
+      ],
+      "enabled": true
+    },
+    "pdf-reader-mcp": {
+      "type": "local",
+      "command": ["npx", "-y", "-q", "@sylphx/pdf-reader-mcp"],
+      "enabled": true
+    },
+    "playwright": {
+      "type": "local",
+      "command": ["npx", "-y", "playwright-mcp", "--browser=chromium"],
+      "enabled": false
+    },
+    "chrome-devtools": {
+      "type": "local",
+      "command": ["npx", "-y", "chrome-devtools-mcp@latest", "--browser-url=http://127.0.0.1:9222"],
+      "enabled": true
+    },
+    "docker": {
+      "type": "local",
+      "command": ["uvx", "mcp-server-docker"]
+    },
+    "github": {
+      "type": "remote",
+      "url": "https://api.githubcopilot.com/mcp/",
+      "enabled": true,
+      "oauth": false,
+      "headers": {
+        "Authorization": "Bearer {env:GITHUB_TOKEN}",
+        "X-MCP-Toolsets": "context,repos,issues,pull_requests,users,actions,git,notifications,orgs,projects,labels,gists,discussions,dependabot,code_security,security_advisories,secret_protection,governance,stargazers,code_quality"
+      }
+    },
+    "atlassian": {
+      "type": "remote",
+      "url": "https://mcp.atlassian.com/v1/mcp",
+      "enabled": true
+    },
+    "slack": {
+      "type": "remote",
+      "url": "https://mcp.slack.com/mcp",
+      "enabled": true,
+      "oauth": {
+        "clientId": "1601185624273.8899143856786",
+        "callbackPort": 3118,
+        "redirectUri": "http://localhost:3118/callback"
+      },
+      "timeout": 30000
+    },
+    "penpot": {
+      "type": "remote",
+      "url": "http://localhost:9001/mcp/stream?userToken={env:PENPOT_TOKEN}",
+      "enabled": true
+    }
+  },
+  // "agent": {
+  //   "bug-hunter": {
+  //     "description": "Debug and fix bugs in the codebase. Invoke when investigating defects, crashes, or unexpected behavior.",
+  //     "mode": "subagent",
+  //     "prompt": "{file:./agents/bug-hunter.md}",
+  //     "permission": { "edit": "allow", "bash": "allow" }
+  //   },
+  //   "code-reviewer": {
+  //     "description": "Review code for quality, consistency, and best practices. This agent is READ-ONLY.",
+  //     "mode": "subagent",
+  //     "prompt": "{file:./agents/code-reviewer.md}",
+  //     "permission": { "edit": "deny" }
+  //   },
+  //   "doc-keeper": {
+  //     "description": "Maintain project documentation. This agent NEVER changes production code.",
+  //     "mode": "subagent",
+  //     "prompt": "{file:./agents/doc-keeper.md}",
+  //     "permission": { "bash": "ask" }
+  //   },
+  //   "feature-builder": {
+  //     "description": "Implement new features and extend existing functionality.",
+  //     "mode": "subagent",
+  //     "prompt": "{file:./agents/feature-builder.md}",
+  //     "permission": { "edit": "allow", "bash": "allow" }
+  //   },
+  //   "life-engineer": {
+  //     "description": "Execute Life Systems Engineering daily practices — system boot, emotional observability, cognitive scanning, energy management, incident response, and architecture review",
+  //     "mode": "subagent",
+  //     "prompt": "{file:./agents/life-engineer.md}",
+  //     "permission": { "edit": "allow", "bash": "allow" }
+  //   },
+  //   "performance-optimizer": {
+  //     "description": "Analyze and improve system performance. Evidence-based optimization only.",
+  //     "mode": "subagent",
+  //     "prompt": "{file:./agents/performance-optimizer.md}",
+  //     "permission": { "edit": "allow", "bash": "allow" }
+  //   },
+  //   "test-engineer": {
+  //     "description": "Create and maintain test suites and verify system behavior.",
+  //     "mode": "subagent",
+  //     "prompt": "{file:./agents/test-engineer.md}",
+  //     "permission": { "edit": "allow", "bash": "allow" }
+  //   }
+  // },
+  "skills": {
+    "paths": ["./skills"]
+  },
+  "plugin": ["opencode-goal-plugin"],
+  "command": {
+    "goal": {
+      "description": "Set a session-scoped goal and auto-continue until complete.",
+      "template": "$ARGUMENTS",
+      "agent": "build"
+    }
+  }
+}
