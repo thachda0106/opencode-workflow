@@ -4,9 +4,8 @@ description: Fetch latest documentation for a library using available documentat
 
 # Get Documentation
 
-> **Gates**: this command follows the tier model in `AGENTS.md`. T0/T1 run with no stops;
-> T2 stops once, after the plan. Investigation notes, plan, and step list all live in
-> `.ai/knowledge/plans/<slug>.md` — not in three root-level files.
+> **Modes and gates**: follow the mode table in `AGENTS.md`. Lightweight runs with no stops;
+> Standard uses Gates 1–3; Full uses Gates 1–4. Work artifacts live under `.ai/work/<slug>/`.
 
 Fetch the latest documentation for a library or framework.
 
@@ -22,7 +21,7 @@ Fetch the latest documentation for a library or framework.
    - Official documentation sites
    - Web search
 3. Assess what aspects of the library are relevant to this project's tech stack
-4. Write findings into `.ai/knowledge/plans/<slug>.md`:
+4. Write findings into `.ai/work/<slug>/plan.md`:
    - Library name and version
    - Documentation source
    - Relevant areas to summarize (API, configuration, integration)

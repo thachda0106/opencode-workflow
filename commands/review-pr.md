@@ -6,9 +6,8 @@ subtask: false
 
 # Review PR / Code Review
 
-> **Gates**: this command follows the tier model in `AGENTS.md`. T0/T1 run with no stops;
-> T2 stops once, after the plan. Investigation notes, plan, and step list all live in
-> `.ai/knowledge/plans/<slug>.md` — not in three root-level files.
+> **Modes and gates**: follow the mode table in `AGENTS.md`. Lightweight runs with no stops;
+> Standard uses Gates 1–3; Full uses Gates 1–4. Work artifacts live under `.ai/work/<slug>/`.
 
 Review code strictly against project architecture rules and coding conventions.
 
@@ -21,7 +20,7 @@ Review code strictly against project architecture rules and coding conventions.
 1. Read project context if present (`context/PROJECT.md`, `context/CONVENTIONS.md`, `context/BOUNDARIES.md`); if those files are absent, infer conventions from existing code and say so
 2. Identify the PR or code changes to review
 3. Understand the purpose and scope of the changes
-4. Write into `.ai/knowledge/plans/<slug>.md`:
+4. Write into `.ai/work/<slug>/plan.md`:
    - Review scope (files, modules affected)
    - Change purpose
    - Areas of concern
@@ -40,7 +39,7 @@ Review code strictly against project architecture rules and coding conventions.
    - Testing
    - Security
 2. Prioritize areas based on the change scope
-3. Write into `.ai/knowledge/plans/<slug>.md`
+3. Write into `.ai/work/<slug>/plan.md`
 
 ---
 

@@ -1,30 +1,55 @@
-# Template — scratchpad (investigation notes)
+# Template — scratchpad (investigation)
 
-> Used by gated flows that still separate investigation from planning. For ordinary work,
-> `/ai-workflow` writes these sections directly into `.ai/knowledge/plans/<slug>.md`.
+> Work artifact. Target: `.ai/work/<slug>/scratchpad.md`. Keep under 80 lines.
+> This file contains evidence and hypotheses, not approved decisions. Conclusions belong in
+> `plan.md`, after Gate 1.
 
-## Objective
+Mode: <Lightweight | Standard | Full Engineering> · Date: <YYYY-MM-DD>
+Objective: <one sentence, in terms of observable behavior>
 
-<one sentence, in terms of observable behaviour>
-
-## Context / scope
+## Scope
 
 - In scope: <files, modules>
 - Out of scope: <what you will not touch>
+- Re-tier point: <what would force a mode change>
 
 ## What exists today
 
-<the traced path, with file:line. This is the part that must be evidence, not memory.>
+<The traced path, with file:line. Evidence, not memory.>
 
-## Architecture invariants
+## Observations
 
-- <what must remain true after the change>
+| # | Observation | Evidence (file:line) | Confidence |
+|---|-------------|----------------------|------------|
 
-## Decisions made
+## Findings
 
-| Decision | Alternative rejected | Why |
-|----------|---------------------|-----|
+<What the observations establish. Short. No speculation disguised as fact.>
 
-## Risks / open questions
+## Hypotheses
 
-- <unknown that could change the design> — <how you would resolve it>
+| # | Hypothesis | Why plausible | How to confirm |
+|---|------------|---------------|----------------|
+
+## Assumptions
+
+- <falsifiable statement> — <why you need it>
+
+## Risks
+
+- <risk> — <impact> — <how to reduce it>
+
+## Open questions
+
+- <unknown that could change the design> — <how you would resolve it> — <owner or next step>
+
+## Alternatives considered
+
+| Alternative | Why it might work | Why it may lose |
+|-------------|-------------------|-----------------|
+
+## Hand-off to Gate 1
+
+- Scope I am asking you to approve: <...>
+- Evidence I have: <n> observations, <n> verified code references
+- What I could not determine: <...>

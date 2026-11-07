@@ -6,9 +6,8 @@ subtask: false
 
 # Refactor Feature
 
-> **Gates**: this command follows the tier model in `AGENTS.md`. T0/T1 run with no stops;
-> T2 stops once, after the plan. Investigation notes, plan, and step list all live in
-> `.ai/knowledge/plans/<slug>.md` — not in three root-level files.
+> **Modes and gates**: follow the mode table in `AGENTS.md`. Lightweight runs with no stops;
+> Standard uses Gates 1–3; Full uses Gates 1–4. Work artifacts live under `.ai/work/<slug>/`.
 
 Refactor the selected code for clarity and maintainability without changing behavior.
 
@@ -30,7 +29,7 @@ Refactor the selected code for clarity and maintainability without changing beha
    - API layer with business logic
    - Missing error handling
 4. Read project context if present (`context/PROJECT.md`, `context/CONVENTIONS.md`, `context/BOUNDARIES.md`); if those files are absent, infer conventions from existing code and say so
-5. Write analysis into `.ai/knowledge/plans/<slug>.md`
+5. Write analysis into `.ai/work/<slug>/plan.md`
 
 ---
 
@@ -48,7 +47,7 @@ Refactor the selected code for clarity and maintainability without changing beha
    - **How** — Show before/after approach
    - **Impact** — Performance or maintainability gains
 3. Risk analysis — what could break?
-4. Write into `.ai/knowledge/plans/<slug>.md`
+4. Write into `.ai/work/<slug>/plan.md`
 
 ---
 
@@ -62,13 +61,13 @@ Refactor the selected code for clarity and maintainability without changing beha
    - What changes
    - Why
    - Expected behavior (must be unchanged)
-3. Write into `.ai/knowledge/plans/<slug>.md`
+3. Write into `.ai/work/<slug>/plan.md`
 
 ---
 
 ## 4 · IMPLEMENT — Refactor
 
-- Refactor step by step in the order defined in `.ai/knowledge/plans/<slug>.md`
+- Refactor step by step in the order defined in `.ai/work/<slug>/plan.md`
 - Ensure behavior is unchanged at each step
 - Do not introduce scope creep
 

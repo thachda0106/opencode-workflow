@@ -78,6 +78,18 @@ psql "$DATABASE_URL" -c "\d+ <table>"   # NOT NULL without default breaks old co
 Time-box: 15 minutes of probes. Anything not probed stays `ASSUMED`/`GAP` — that is a valid
 outcome and must be reported as one.
 
+### 3a. Reconcile the implementation flows
+
+For every Tier A path:
+
+1. Compare the actual code path with `.ai/work/<slug>/implementation-flows.md` and the feature's
+   `full-flow.md`.
+2. Keep `[P]` labels until the behavior is verified; change to `[V]` only with evidence.
+3. Record every deviation: planned behavior → actual behavior → reason.
+4. A Tier A path with no diagram, or a diagram that contradicts the code, is a `GAP`.
+5. Carry the reconciliation result into Gate 4; do not approve completion with unresolved flow
+   contradictions.
+
 ### 4. Output (≤40 lines, in this shape)
 
 ```

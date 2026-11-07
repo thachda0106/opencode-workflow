@@ -1,55 +1,37 @@
-# <feature> — knowledge report
+# <feature> — README
 
-Tier: <T1/T2> · Date: <YYYY-MM-DD> · Revised: <YYYY-MM-DD>
+Mode: <Standard | Full Engineering> · Date: <YYYY-MM-DD> · Revised: <YYYY-MM-DD>
 Scope: <files touched, count>
 
-## 1. What changed
+## What it does
 
-| File | Change | Why |
-|------|--------|-----|
+<2–3 sentences. Observable behavior, not implementation history.>
 
-## 2. Why this way
+## Why it exists
 
-<the constraint that forced the shape>
-Rejected: <alternative> — <one-line reason>
+<The business or technical constraint that forced this feature.>
 
-## 3. How it works
+## Actors and triggers
 
-<trigger> → <hop 1 (file:line)> → <hop 2> → <durable effect>
+| Actor / trigger | What happens | Outcome |
+|-----------------|--------------|---------|
 
-## 4. Components that interact
+## Main components
 
-| Component | Direction | Contract | Breaks if |
-|-----------|-----------|----------|-----------|
+| Component | Responsibility | Entry point |
+|-----------|----------------|-------------|
 
-## 5. Decisions worth knowing
+## Source files
 
-- **<decision>** — chosen over <alternative>; costs <what>.
+| File | Why it matters |
+|------|----------------|
 
-## 6. Assumptions
+## Read next
 
-1. <falsifiable statement> — `verified` | `assumed`
+- [full-flow.md](full-flow.md) — complete execution lifecycle, diagrams, debugging guide.
+- [architecture.md](architecture.md) — boundaries, dependencies, integration points.
+- [decisions.md](decisions.md) — decisions, alternatives, trade-offs, limitations.
 
-## 7. What can go wrong in production
+## Top risks
 
-- <trigger> → <symptom> → <first check>
-
-## 8. Where debugging begins
-
-| Symptom | Start at | Then |
-|---------|----------|------|
-
-## 9. Understand more deeply (max 3)
-
-- **<mechanism>** — why it matters · the question you should answer without looking ·
-  read `<file:line–line>`
-
----
-
-## Path
-
-<optional: filled by /explain-logic when this path is Tier A>
-
-## Production risks
-
-<optional: filled by stress-test-implementation>
+- <risk> — <where to look / what to check>

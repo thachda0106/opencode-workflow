@@ -164,12 +164,61 @@ def check_contract() -> None:
     for token in ("T0", "T1", "T2", "VERIFIED", "TESTED", "ASSUMED", "GAP"):
         if token not in text:
             add("FAIL", "contract", f"AGENTS.md missing '{token}'")
-    for f in ("index.md", "feature.md", "critical-paths.md", "gotchas.md", "adr-template.md"):
+    for f in ("index.md", "feature.md", "critical-paths.md", "gotchas.md", "adr-template.md",
+              "full-flow.md", "architecture.md", "decisions.md"):
         if not (ROOT / "templates" / "knowledge" / f).exists():
             add("FAIL", "contract", f"templates/knowledge/{f} missing")
+    if not (ROOT / "prompts" / "templates" / "implementation-flows.md").exists():
+        add("FAIL", "contract", "prompts/templates/implementation-flows.md missing")
     if not (ROOT / "scripts" / "install.sh").exists():
         add("FAIL", "contract", "scripts/install.sh missing")
     add("PASS", "contract", "tier model, epistemic labels, knowledge templates present")
+
+
+def check_workflow_contract() -> None:
+    text = (ROOT / "AGENTS.md").read_text(encoding="utf-8", errors="replace")
+    tokens = (
+        "Lightweight", "Standard", "Full Engineering",
+        "GATE 1", "GATE 2", "GATE 3", "GATE 4",
+        ".ai/work/", "implementation-flows.md", "full-flow.md",
+        "design-implementation-flows", "Context recovery",
+        "Level 1", "Level 2", "Level 3",
+    )
+    missing = [t for t in tokens if t not in text]
+    if missing:
+        add("FAIL", "workflow", f"AGENTS.md missing workflow tokens: {missing}")
+    else:
+        add("PASS", "workflow", "mode routing, four gates, artifacts, ownership levels present")
+
+    flow_doc = ROOT / "prompts" / "templates" / "implementation-flows.md"
+    full_flow = ROOT / "templates" / "knowledge" / "full-flow.md"
+    for label, path in (("implementation-flows", flow_doc), ("full-flow", full_flow)):
+        if not path.exists():
+            continue
+        body = path.read_text(encoding="utf-8", errors="replace")
+        if "```mermaid" not in body:
+            add("FAIL", "workflow", f"{path.relative_to(ROOT)} has no Mermaid block")
+        if not any(tag in body for tag in ("[V]", "[P]", "[?]")):
+            add("FAIL", "workflow", f"{path.relative_to(ROOT)} has no evidence labels")
+
+    stale: list[str] = []
+    for p in sorted((ROOT / "commands").glob("*.md")) + sorted((ROOT / "skills").rglob("*.md")):
+        if p.name == "review-plan.md" or p.parent.name == "transfer-implementation-knowledge":
+            continue
+        body = p.read_text(encoding="utf-8", errors="replace")
+        if ".ai/knowledge/plans/<slug>.md" in body:
+            stale.append(str(p.relative_to(ROOT)))
+    if stale:
+        add("FAIL", "workflow", f"stale legacy plan path in: {stale}")
+    else:
+        add("PASS", "workflow", "no stale legacy plan paths in commands/skills")
+
+    workflow = (ROOT / "commands" / "ai-workflow.md").read_text(encoding="utf-8", errors="replace")
+    missing_gates = [g for g in ("GATE 1", "GATE 2", "GATE 3", "GATE 4") if g not in workflow]
+    if missing_gates:
+        add("FAIL", "workflow", f"ai-workflow.md missing gates: {missing_gates}")
+    else:
+        add("PASS", "workflow", "ai-workflow.md carries the four-gate lifecycle")
 
 
 def _strip_jsonc(text: str) -> str:
@@ -265,8 +314,8 @@ def check_parity() -> None:
 def main() -> int:
     strict = "--strict" in sys.argv
     for fn in (check_skills, check_agents, check_commands, check_dead_refs,
-               check_skill_refs, check_contract, check_config, check_context_refs,
-               check_parity):
+               check_skill_refs, check_contract, check_workflow_contract, check_config,
+               check_context_refs, check_parity):
         fn()
 
     order = {"FAIL": 0, "WARN": 1, "PASS": 2}

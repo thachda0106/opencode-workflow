@@ -14,8 +14,40 @@ OpenCode loads exactly four things from a config directory:
 | Commands | `commands/*.md` | `/command` entry points |
 | Skills | `skills/*/SKILL.md` | on demand, via the `skill` tool |
 
-Nothing else. A folder named `agents/` somewhere that is not a config directory is inert —
-that is why 18 agents here had never run.
+Nothing else. A folder named `agents/` somewhere that is not a config directory is inert.
+
+## Workflow modes
+
+The workflow scales with consequence, not file count. Full policy: `AGENTS.md`.
+
+| Mode | Tier | Gates | Work artifacts | Knowledge |
+|------|------|-------|----------------|-----------|
+| Lightweight | T0 | 0 | none | one-line chat note |
+| Standard | T1 | 3 (G1–G3) | `.ai/work/<slug>/{scratchpad,plan,tasks}.md`; flows mandatory when behavior changes | `features/<slug>/README.md` + `full-flow.md` |
+| Full Engineering | T2 | 4 (G1–G4) | all four + `review.md` | full package: README, full-flow, architecture, decisions |
+
+The main entry point is `/ai-workflow`. `/create-feature` and `/fix-bug` route into the same
+lifecycle.
+
+## Artifacts
+
+```text
+.ai/work/<slug>/                 # process state, git-tracked
+  scratchpad.md
+  plan.md
+  tasks.md
+  implementation-flows.md
+  review.md
+
+.ai/knowledge/features/<slug>/   # durable knowledge
+  README.md
+  full-flow.md
+  architecture.md
+  decisions.md
+```
+
+Legacy `.ai/knowledge/features/<slug>.md` and `.ai/knowledge/plans/<slug>.md` remain readable;
+new work does not write them.
 
 ## Install
 
@@ -34,29 +66,33 @@ by hand. MCP servers expect these environment variables (set values in your shel
 repo): `POSTGRES_PASSWORD`, `MYSQL_PASSWORD`, `GITHUB_TOKEN`, `PENPOT_TOKEN`. `go-mcp-mysql.exe`
 resolves from `PATH` (Go bin directory).
 
+Restart OpenCode after installing; skills and commands are loaded at startup.
+
 ## Verify
 
 ```bash
-python3 scripts/verify.py          # schema, references, gate audit, install parity
-opencode agent list                # what actually loaded
+python scripts/verify.py          # schema, references, workflow contract, install parity
+opencode debug skill              # which skills actually loaded and from where
+opencode agent list               # what actually loaded
 ```
 
 ## Layout
 
 ```
-AGENTS.md                  operating contract (tiering, gates, epistemic labels, knowledge store)
+AGENTS.md                  operating contract (modes, gates, artifacts, epistemic labels, knowledge)
 skills/                    single-responsibility procedures, loaded on demand
-  map-critical-paths/          rank code paths by ownership risk
-  transfer-implementation-knowledge/  engineering knowledge report
-  verify-ownership/            knowledge check with hidden answer key
-  stress-test-implementation/  production failure-mode pass
+  design-implementation-flows/      pre-code Mermaid flow design
+  map-critical-paths/               rank code paths by ownership risk
+  transfer-implementation-knowledge/ visual knowledge package
+  verify-ownership/                 Level 1-3 ownership check
+  stress-test-implementation/       production failure-mode pass
   analyze-project-structure/ trace-execution-flow/ locate-code-patterns/
   validate-architecture/ diagnose-bug-root-cause/ apply-targeted-fix/ verify-bug-regression/
-commands/                  entry points; /knowledge-report and /ownership-check are the new ones
-agents/                     specialist subagents
+commands/                  entry points; /ai-workflow is the master lifecycle
+agents/                    specialist subagents
 templates/knowledge/       the .ai/knowledge/ contract to copy into a project
-context/                   optional per-project templates (PROJECT/CONVENTIONS/BOUNDARIES) —
-                           copy into a project by hand; nothing auto-loads them
+prompts/templates/         scratchpad, plan, tasks, implementation-flows, review templates
+context/                   optional per-project templates; nothing auto-loads them
 scripts/                   install.sh · verify.py · normalize.py
 docs/                      audit, architecture, validation
 _retired/                  superseded files, kept for reference
@@ -64,7 +100,8 @@ _retired/                  superseded files, kept for reference
 
 ## Design in one paragraph
 
-Effort tracks risk. A two-file change gets no gates and a one-line note; a change that touches a
-transaction boundary gets a plan, one approval, a failure-mode pass, and a knowledge report.
-Every completion states what was verified by command, what is covered by tests, what is assumed,
-and what remains untested. Knowledge lands in the repo's `.ai/knowledge/`, not in chat history.
+Effort tracks consequence. A two-file change gets no gates and a one-line note. A normal feature
+gets three approvals and a visual flow before code. A payment, authz, concurrency, or migration
+change gets four approvals, a failure-mode pass, and a visual knowledge package. Every completion
+states what was verified by command, what is covered by tests, what is assumed, and what remains
+untested. Knowledge lands in `.ai/knowledge/`, not in chat history.

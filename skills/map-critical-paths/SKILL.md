@@ -78,6 +78,20 @@ Tier C: sum ≤ 4
 4. **What breaks silently** — the failure that leaves no error: missing event, stale cache,
    double charge, orphan row.
 
+### 4a. Flow and review priority
+
+The ranking decides how much visual and review effort each path deserves. Do not apply the same
+depth everywhere.
+
+| Tier | Implementation flows | Review depth | Stress pass | Ownership |
+|------|---------------------|--------------|-------------|-----------|
+| **A** | Mandatory flowchart + sequence/state as applicable | All dimensions, hand-trace, concurrency, rollback | Mandatory | Level 3 |
+| **B** | Flowchart if it materially clarifies behavior | Correctness, bugs, security, architecture, tests | If write/state/external | Level 2 |
+| **C** | None | Correctness and conventions | Lightweight | Level 1 |
+
+Every Tier A path must appear in `.ai/work/<slug>/implementation-flows.md` and in the feature's
+`full-flow.md`. If a Tier A path cannot be represented, state why and record the gap.
+
 ### 5. Output
 
 Table, ranked by tier then sum:

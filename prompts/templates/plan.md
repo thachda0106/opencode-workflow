@@ -1,47 +1,77 @@
-# Template — plan
+# Template — plan (engineering decisions)
 
-> Tier-2 artifact. Target path: `.ai/knowledge/plans/<slug>.md`. Keep it under 40 lines.
+> Work artifact. Target: `.ai/work/<slug>/plan.md`. Keep under 80 lines.
+> The approved plan is the execution baseline. Silent changes are not allowed.
 
-Tier: T2 · trigger: <the tier trigger, with file:line>
+Mode: <Standard | Full Engineering> · Tier: <T1 | T2> · Date: <YYYY-MM-DD>
+Status: <draft | approved | superseded> · Approved: <date / gate>
 Objective: <one sentence>
+
+## Scope
+
+- In scope: <files, modules>
+- Out of scope: <explicit non-goals>
+- Re-tier point: <what would change the mode>
 
 ## Invariants that must hold
 
-- <invariant 1>
-- <invariant 2>
+| ID | Invariant | Test / check |
+|----|-----------|--------------|
+| INV1 | <must remain true> | <how it is asserted> |
 
-## Approach
+## Findings summary
 
-<3–6 lines. The design, not the steps.>
+<What the investigation established, with evidence references. Link to scratchpad.>
 
-## Rejected alternative
+## Architecture decisions
 
-<what you considered and why it loses. If nothing real was considered, write "none worth
-considering" — do not invent one.>
+| ID | Decision | Alternative rejected | Why |
+|----|----------|----------------------|-----|
+| D1 | <chosen> | <rejected> | <reason> |
 
-## Files
+## Trade-offs
 
-| File | Change |
-|------|--------|
+- <what this costs> — <why acceptable>
+- <what becomes harder> — <mitigation>
 
-## Steps
+## Impacted components
 
-1. <step — verifiable on its own>
-2. <step>
+| Component | Change | Contract / boundary affected |
+|-----------|--------|------------------------------|
 
 ## Failure modes
 
 | If this fails | System state | Handled how |
 |---------------|--------------|-------------|
 
-## Verification
+## Security
+
+- Trust boundary: <where input crosses>
+- Authn/authz: <role and object-level checks>
+- Secrets/data exposure: <none / how handled>
+- Injection / mass assignment: <risk and control>
+
+## Rollback
+
+<How to undo the change safely. Migration path if schema changed.>
+
+## Verification strategy
 
 ```bash
 <commands>
 ```
 
-Scenarios: <the cases that must be exercised, including one failure path>
+Scenarios: <happy path, failure path, concurrency/rollback where relevant>
+
+## Acceptance criteria
+
+- [ ] <observable outcome>
+- [ ] <test asserts behavior>
 
 ## Non-goals
 
 - <explicitly not doing this>
+
+## Approved baseline
+
+<Filled after Gate 2. Any later change gets a delta and re-approval.>

@@ -4,9 +4,8 @@ description: Generate a comprehensive deep-dive doc explaining how a hook/module
 
 # Deep Dive
 
-> **Gates**: this command follows the tier model in `AGENTS.md`. T0/T1 run with no stops;
-> T2 stops once, after the plan. Investigation notes, plan, and step list all live in
-> `.ai/knowledge/plans/<slug>.md` — not in three root-level files.
+> **Modes and gates**: follow the mode table in `AGENTS.md`. Lightweight runs with no stops;
+> Standard uses Gates 1–3; Full uses Gates 1–4. Work artifacts live under `.ai/work/<slug>/`.
 
 Produce a comprehensive deep-dive document for one or more source files. Follow this structure strictly.
 
@@ -19,7 +18,7 @@ Produce a comprehensive deep-dive document for one or more source files. Follow 
 3. Read all consumer files where the target is invoked
 4. Read the API layer that persists downstream changes
 5. Trace one complete operation: user action → target → library → consumer → API → response
-6. Write findings into `.ai/knowledge/plans/<slug>.md`:
+6. Write findings into `.ai/work/<slug>/plan.md`:
    - Entry points and signatures
    - File relationships
    - Event/channel names
@@ -34,7 +33,7 @@ Produce a comprehensive deep-dive document for one or more source files. Follow 
    - Diagrams to produce
    - Variables needing declarative definitions
    - Type definitions to extract
-2. Write into `.ai/knowledge/plans/<slug>.md`:
+2. Write into `.ai/work/<slug>/plan.md`:
    - TOC with section headings
    - Diagram types per section
    - Ordering rationale

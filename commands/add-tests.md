@@ -6,9 +6,8 @@ subtask: false
 
 # Add Tests
 
-> **Gates**: this command follows the tier model in `AGENTS.md`. T0/T1 run with no stops;
-> T2 stops once, after the plan. Investigation notes, plan, and step list all live in
-> `.ai/knowledge/plans/<slug>.md` — not in three root-level files.
+> **Modes and gates**: follow the mode table in `AGENTS.md`. Lightweight runs with no stops;
+> Standard uses Gates 1–3; Full uses Gates 1–4. Work artifacts live under `.ai/work/<slug>/`.
 
 Generate comprehensive tests for the selected code following project testing standards.
 
@@ -26,7 +25,7 @@ Generate comprehensive tests for the selected code following project testing sta
 3. Understand business logic and edge cases
 4. Identify dependencies to mock
 5. Find existing test patterns for consistency
-6. Write analysis into `.ai/knowledge/plans/<slug>.md`
+6. Write analysis into `.ai/work/<slug>/plan.md`
 
 ---
 
@@ -38,7 +37,7 @@ Generate comprehensive tests for the selected code following project testing sta
    - Test file naming and location per project conventions
    - Setup/teardown approach
 2. Risk analysis — what's hard to test? What could be flaky?
-3. Write into `.ai/knowledge/plans/<slug>.md`
+3. Write into `.ai/work/<slug>/plan.md`
 
 ---
 
@@ -56,7 +55,7 @@ Generate comprehensive tests for the selected code following project testing sta
    - Input / setup
    - Expected outcome
    - Dependencies to mock
-3. Write into `.ai/knowledge/plans/<slug>.md`
+3. Write into `.ai/work/<slug>/plan.md`
 
 ---
 

@@ -27,8 +27,19 @@ Ask once. If declined, drop it and do not re-offer this session.
 
 ### 1. Build the question set (5–7 questions)
 
-Read the diff and the knowledge report first. Every question must be answerable **only** from
-this implementation — no general-knowledge questions.
+Read the diff, `.ai/knowledge/features/<slug>/README.md`, and `full-flow.md` first. Every
+question must be answerable **only** from this implementation — no general-knowledge questions.
+
+Map the questions to the ownership levels:
+
+| Ownership level | Question levels | Priority |
+|-----------------|-----------------|----------|
+| **Level 1 — Awareness** | Locate | One question |
+| **Level 2 — Understanding** | Trace, Decide | At least one of each |
+| **Level 3 — Ownership** | Fail, Operate | At least one Fail and one Operate for Tier A paths |
+
+Do not spend Level 3 attention on boilerplate. Do not skip Level 3 on a Tier A path because the
+diff is small.
 
 Cover the five levels, in this order:
 

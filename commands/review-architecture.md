@@ -6,9 +6,8 @@ subtask: false
 
 # Review Architecture
 
-> **Gates**: this command follows the tier model in `AGENTS.md`. T0/T1 run with no stops;
-> T2 stops once, after the plan. Investigation notes, plan, and step list all live in
-> `.ai/knowledge/plans/<slug>.md` — not in three root-level files.
+> **Modes and gates**: follow the mode table in `AGENTS.md`. Lightweight runs with no stops;
+> Standard uses Gates 1–3; Full uses Gates 1–4. Work artifacts live under `.ai/work/<slug>/`.
 
 Review the codebase against the project's architecture rules as defined in `context/PROJECT.md` and `context/CONVENTIONS.md`. If those files are absent, infer the rules from existing patterns and state that assumption.
 
@@ -23,7 +22,7 @@ Review the codebase against the project's architecture rules as defined in `cont
    - Which modules/components to check
    - What rules apply (directory structure, imports, naming, layers)
 3. Catalog the architecture rules to validate against
-4. Write into `.ai/knowledge/plans/<slug>.md`:
+4. Write into `.ai/work/<slug>/plan.md`:
    - Review scope
    - Architecture rules to check
    - Files/modules to examine
@@ -35,7 +34,7 @@ Review the codebase against the project's architecture rules as defined in `cont
 1. Define the review strategy:
    - Order of checks (directory → imports → naming → layers → DI)
    - Priority areas (known problem spots vs. full scan)
-2. Write into `.ai/knowledge/plans/<slug>.md`
+2. Write into `.ai/work/<slug>/plan.md`
 
 ---
 

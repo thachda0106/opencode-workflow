@@ -1,104 +1,117 @@
 ---
 name: transfer-implementation-knowledge
-description: Produce an Engineering Knowledge Report after implementation — what changed, why, how it works, what can break, where to debug, and the 1-3 details you must understand yourself. Use when a T2 change is complete, or when the engineer asks what they need to know about a change.
+description: Produce a durable per-feature knowledge package after implementation — README, visual full-flow, architecture, and decisions — so another engineer can understand, debug, and own the feature without the chat transcript.
 metadata:
   layer: knowledge
   stage: post-implementation
 ---
 
-
 # Skill: transfer-implementation-knowledge
 
-Convert an implementation into understanding. The report is written **from the diff and the
-code**, not from the plan — plans describe intent, the report must describe what is actually
-on disk.
+Convert an implementation into understanding. Write from the diff, the code, and the verified
+flows — not from the plan. Plans describe intent; the package must describe what is actually on
+disk.
 
 ## When to use
 
-- After any T2 implementation, before declaring the task done.
-- After a T1 change when it introduced a new pattern, dependency, or failure mode.
+- After any Full Engineering change, before declaring it complete.
+- After a Standard change when behavior, boundaries, or failure modes changed.
 - On request: "explain what you just built", "what do I need to understand here".
 
-Not for: line-by-line code walkthroughs, API reference docs, or tutorials on the framework.
+Not for: line-by-line code walkthroughs, API reference docs, framework tutorials, or grading the
+implementation.
 
 ## Inputs
 
-1. The diff: `git diff HEAD` or `git diff origin/main...HEAD` — the authoritative source.
-2. The entry points the diff touches (read the full function, not just the hunk).
-3. The existing `.ai/knowledge/` for this area — update, do not duplicate.
-4. Test output actually observed in this session.
+1. The diff: `git diff HEAD` or `git diff origin/main...HEAD` — authoritative.
+2. `.ai/work/<slug>/plan.md` and `tasks.md` — approved decisions and task mapping.
+3. `.ai/work/<slug>/implementation-flows.md` — pre-code design and deviations.
+4. The entry points the diff touches; read the full function, not just the hunk.
+5. Test output actually observed in this session.
+6. Existing `.ai/knowledge/features/<slug>/` — update, never duplicate.
 
-## Report structure (fixed — 9 sections)
-
-Write to `.ai/knowledge/features/<slug>.md`. Every section is mandatory; keep total ≤120 lines.
-
-### 1. What changed
-One table. No prose.
+## Output package
 
 ```
-| File | Change | Why |
-|------|--------|-----|
-| src/orders/order.service.ts:112 | new tx wrapping order+outbox insert | prevent partial commit |
+.ai/knowledge/features/<slug>/
+  README.md
+  full-flow.md
+  architecture.md
+  decisions.md
 ```
 
-### 2. Why it changed this way
-The constraint that forced the shape. Name the alternative you rejected and the one sentence
-reason. If there was no alternative worth considering, say "no meaningful alternative".
+| File | Contents | Budget |
+|------|----------|--------|
+| `README.md` | What/why, actors, triggers, outcomes, main components, entry points, source links | ≤60 lines |
+| `full-flow.md` | Complete visual lifecycle: flowcharts, sequence diagrams, critical decisions, source mapping, debugging guide, ownership checklist | ≤200 lines |
+| `architecture.md` | Boundaries, dependencies, patterns, data ownership, integration points | ≤100 lines |
+| `decisions.md` | Decisions, alternatives, reasons, trade-offs, limitations | ≤100 lines |
 
-### 3. How it works
-The path, as a numbered chain with file:line at each hop. Start at the trigger, end at the
-durable effect (row written, event published, response sent). One line per hop, max 10 hops.
-If a hop is a library call that does something non-obvious, name what it does in 5 words.
+- **Standard:** `README.md` + `full-flow.md`; fold architecture/decisions in when small.
+- **Full:** all four mandatory.
+- **Pure refactor/rename with identical behavior:** short note, no forced diagram; state why.
 
-### 4. Components that interact
-Only real couplings: what calls in, what it calls out, what shares state. Table:
+If the package exceeds its budget, the feature is too large or the file is restating the code.
+Split the feature or cut duplication.
 
-```
-| Component | Direction | Contract | Breaks if |
-```
+## `full-flow.md` — mandatory content
 
-### 5. Technical decisions worth knowing
-Each decision: chosen · rejected · what it costs. Only decisions a future maintainer could
-reverse by accident. If a "decision" is just following an existing pattern, say
-"followed existing pattern in <file>" — that is useful information.
+### A. Feature overview
 
-### 6. Assumptions this relies on
-Numbered list. Each must be falsifiable: "the upstream service always sends `event_id`" is
-useful; "the system is reliable" is not. Mark each `verified` / `assumed`.
+Business purpose, actors, trigger conditions, expected outcomes. Two or three sentences; no
+framework history.
 
-### 7. What can go wrong in production
-3–6 concrete failures. Each: trigger → symptom → first check. No generic risks.
+### B. Full execution flow
 
-```
-- Double settlement: gateway retries the webhook after our 30s timeout → two ledger rows →
-  check `select event_id, count(*) from ledger group by 1 having count(*) > 1`
-```
+A Mermaid flowchart of the complete lifecycle: trigger → entry point → validation → business
+logic → persistence/external calls → response/effect. Include alternative and error paths, not
+just the happy path.
 
-### 8. Where debugging begins
-The exact starting point. Not "check the logs".
+### C. Sequence diagrams
 
-```
+Where applicable: frontend/backend, internal services, database operations, external
+integrations, asynchronous events, error handling.
+
+### D. Critical decision points
+
+Conditions, business rules, state transitions, transaction boundaries, retry behavior, failure
+handling. This is the Level 3 section: explain what a maintainer must understand to avoid
+breaking the system silently.
+
+### E. Source code mapping
+
+| Step | File:line | Class/function | Responsibility | Task |
+|------|-----------|----------------|----------------|------|
+
+Every important step references real code. A stale line number is worse than no line number.
+
+### F. Production debugging guide
+
 | Symptom | Start at | Then |
-| order stuck in PENDING | order.service.ts:131 (tx boundary) | `select * from outbox where aggregate_id = ...` |
-```
+|---------|----------|------|
 
-### 9. What you should understand more deeply
-**1–3 items, maximum.** This is the highest-value section and the easiest to ruin by being
-generous. Each item:
+Where to put the first breakpoint or log, which failure points matter, how errors propagate, what
+to inspect when behavior differs from expectations. No "check the logs".
 
-```
-- <specific mechanism, named>: why it matters (one line) ·
-  the question you should be able to answer without looking ·
-  read: <file:line range>
-```
+### G. Engineering ownership checklist
 
-Selection rule — pick from, in priority order:
-1. any path `map-critical-paths` scored Tier A,
-2. the one place the implementation was not obvious to write,
-3. the one place a future change is most likely to break silently.
+- **Verified facts:** what was observed or executed.
+- **Assumptions:** what is reasoned but not exercised.
+- **Untested behavior:** what nobody has run.
+- **Remaining risks:** the highest-impact gaps.
 
-Never include: framework boilerplate, DTO shapes, config wiring, anything a competent engineer
-would infer from the file name.
+For each item, name the file:line range to read and the question the engineer should be able to
+answer without looking.
+
+## Labelling and truth rules
+
+- `[V]` verified existing behavior with `file:line`.
+- `[P]` planned behavior with task ID.
+- `[?]` unknown; add it to open questions.
+- `VERIFIED` / `TESTED` / `ASSUMED` / `GAP` labels apply to claims in prose and tables.
+- Never invent behavior to complete a diagram. Unknown is a valid, useful state.
+- Mermaid source stays inside Markdown so it remains editable and version-controlled.
+- Distinguish existing behavior from behavior introduced by this change.
 
 ## Chat output
 
@@ -111,37 +124,25 @@ Understand: <1-3 items, name only>
 Watch: <top production failure>
 Debug: <start point>
 Verified: <...> · Assumed: <...>
-Full report: .ai/knowledge/features/<slug>.md
+Knowledge: .ai/knowledge/features/<slug>/
 ```
 
-Do not paste the report into chat. Do not narrate the sections one by one.
+Do not paste the package into chat. Do not narrate every section.
 
-## Rules
+## Update rules
 
-- **Evidence over memory.** Every file:line must be checked against disk at write time. A stale
-  line number is worse than no line number.
-- **No forward references.** If §3 uses a term defined in §5, define it inline first.
-- **Concrete numbers.** Real event ids, real table names, real timeouts. No `foo`, no `example.com`.
-- **Update, don't append.** If a report for this feature exists, revise it; add a `Revised:`
-  date line at the top.
-- **Length is a feature.** If the report exceeds 120 lines, the feature was too large or the
-  report is repeating the code. Cut §1 and §4 first.
-- **Say what you did not verify.** §6 and §7 must contain at least one `assumed` item or you
-  did not look hard enough.
-
-## After writing
-
-Append one line to `.ai/knowledge/index.md`:
-
-```
-features/<slug>.md · YYYY-MM-DD · <one-phrase purpose>
-```
-
-Then offer — once, not repeatedly — the `verify-ownership` check.
+- Read `.ai/knowledge/index.md` first. If a package or legacy report exists, update it.
+- Legacy `.ai/knowledge/features/<slug>.md`: either update it or migrate it to a package; never
+  maintain both.
+- Update `full-flow.md` in the same change that alters execution behavior.
+- Append one line to `.ai/knowledge/index.md`:
+  `features/<slug>/README.md · YYYY-MM-DD · <one-phrase purpose>`.
+- Offer the `verify-ownership` check once, not repeatedly.
 
 ## Non-goals
 
-- Restating the plan (`plans/<slug>.md` already exists).
-- Teaching the framework. If the reader needs NestJS fundamentals, link the docs once.
-- Review findings. Correctness verdicts belong to `review-implemented-files`; this report can
-  describe a flaw but must not grade the code.
+- Restating the plan or the implementation tasks.
+- Teaching the framework.
+- Review verdicts. Describe a flaw if it matters, but do not grade the code.
+- Replacing `stress-test-implementation`; the package records its findings, it does not replace
+  the failure-mode pass.

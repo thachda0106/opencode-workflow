@@ -224,3 +224,107 @@ line the first run caught).
 Still open from §6: history purge of passwords committed in `HEAD` (rotate the local DB passwords
 instead); MCP env-var interpolation in command args (assumed, verify after restart); live
 `opencode.json` mirror (manual step).
+
+---
+
+## 8. Engineering Ownership Workflow validation — 2026-11-07
+
+Baseline before the upgrade: `python scripts/verify.py` → 10 pass · 0 warn · 0 fail.
+
+### 8.1 Structural validation
+
+```
+$ python scripts/verify.py
+PASS agents    25 agents schema-valid
+PASS commands  25 commands have descriptions; gate policy checked
+PASS config    opencode.json parses; no literal credentials
+PASS config    no machine-specific absolute paths
+PASS contract  tier model, epistemic labels, knowledge templates present
+PASS parity    142 in sync · 0 not installed · 0 stale (dest: ~/.config/opencode)
+PASS refs      all referenced template paths exist on disk
+PASS refs      13 skill/agent cross-references resolve
+PASS refs      context/ references are conditional or absent
+PASS skills    15 skills schema-valid
+PASS workflow  mode routing, four gates, artifacts, ownership levels present
+PASS workflow  no stale legacy plan paths in commands/skills
+PASS workflow  ai-workflow.md carries the four-gate lifecycle
+
+13 pass · 0 warn · 0 fail
+```
+
+### 8.2 Install and runtime load
+
+```
+$ bash scripts/install.sh --dry-run
+installed/updated: 36 · unchanged: 106 · backed up: 0
+
+$ bash scripts/install.sh
+installed/updated: 36 · unchanged: 106 · backed up: 31
+backup: ~/.config/opencode/.backup-20261107-102850
+
+# second sync after tightening the nine legacy command headers
+$ bash scripts/install.sh
+installed/updated: 9 · unchanged: 133 · backed up: 9
+backup: ~/.config/opencode/.backup-20261107-103838
+
+# third sync after aligning Standard flow wording
+$ bash scripts/install.sh
+installed/updated: 4 · unchanged: 138 · backed up: 4
+backup: ~/.config/opencode/.backup-20261107-105531
+
+$ opencode debug skill | grep design-implementation-flows
+FOUND design-implementation-flows
+```
+
+`opencode.json` was not touched. The backup directory is the rollback point.
+
+### 8.3 Workflow simulations (spec-level)
+
+These are rule-based walkthroughs against the installed `AGENTS.md` and commands, not runtime
+transcripts. They verify mode selection, gate count, artifact expectations, and flow placement.
+
+| Scenario | Request | Selected mode | Gates | Expected artifacts | Flow requirement | Knowledge |
+|----------|---------|---------------|-------|--------------------|------------------|-----------|
+| Trivial bug fix | Fix a null check in one file, no critical surface | Lightweight (T0) | 0 | none | none | one-line chat note |
+| Normal feature | Add `GET /orders/:id` in one module, 3 files, no critical surface | Standard (T1) | 3 | `scratchpad.md`, `plan.md`, `tasks.md` | mandatory: new public interface | `README.md` + `full-flow.md` |
+| Complex change | Coupon redemption: transaction + concurrency + migration | Full (T2) | 4 | all four work artifacts + `review.md` | mandatory: flowchart + sequence/state + failure paths | all four package files |
+| Interrupted session | Resume after Gate 3 | Same as original | Resume at last verified checkpoint | read work artifacts + git state; verify tasks | flows re-checked | package used as context |
+| Standard escalation | Standard discovers a migration | Full (T2) | Re-gate G2/G3; G4 added | flows become mandatory | failure paths added | full package |
+
+Verification against the installed text:
+
+- Lightweight path: `AGENTS.md` §2 states "No artifacts, no gates."
+- Standard path: §2 lists GATE 1–3 and `.ai/work/<slug>/` artifacts.
+- Full path: §2 lists GATE 1–4, `review.md`, and the full package.
+- Flow stage: §2 places `implementation-flows.md` after GATE 3 and before implementation.
+- Recovery: §6 lists the work artifacts, git inspection, and task verification.
+
+Runtime classification probes (plan agent, no files modified):
+
+```
+$ opencode run --agent plan "Print only the Mode line ... rename a config value in one file"
+Mode: Lightweight (T0) — trigger: single config value rename in one file, no critical surface,
+no new public interface.
+
+$ opencode run --agent plan "Print only the Mode line ... add GET /orders/:id ... 3 files"
+Mode: Standard (T1) — trigger: one module (orders), 3 files, no critical surface. Scope lock:
+orders module only; re-tier if authz/transaction/external contract appears.
+
+$ opencode run --agent plan "Classify only ... coupon redemption ... transaction, concurrency,
+migration"
+Mode: Full Engineering (T2) — trigger: DB transaction boundary + concurrency/locking +
+migration/schema change (coupon redemption in checkout).
+```
+
+These prove the installed `AGENTS.md` drives mode selection. They do not prove that later gate
+stops are honored; that remains the runtime risk in §8.4.
+
+### 8.4 What is verified vs assumed
+
+- **Verified:** schema, references, workflow contract, Mermaid templates, stale-path checks,
+  install parity, skill loading, and runtime mode classification for Lightweight/Standard/Full.
+- **Assumed:** the model will pause at each gate in a live session; gates are prompt-driven and
+  not mechanically enforced.
+- **Untested risk:** a real Full-mode session has not been run end-to-end through Gates 1–4 after
+  installation; the first real feature will be the gate-discipline test. Restart OpenCode before relying on the new
+  skills/commands.

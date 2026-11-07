@@ -1,160 +1,185 @@
-# Architecture — AI accelerates implementation, AI facilitates understanding, human owns
+# Architecture — AI accelerates implementation, the engineer owns the system
 
 ## 1. Design principles
 
-1. **One always-loaded rule file decides the process.** Tiers, gates, evidence labels and the
-   knowledge contract live in `AGENTS.md`. Commands and skills reference it instead of restating
-   it — that is what caused 45 divergent gates.
-2. **Effort tracks consequence, not file count.** Nine risk dimensions, with a promotion rule so
-   that a single dangerous property (transaction boundary, concurrency, object-level authz,
-   mutable state) cannot be averaged away by cheap ones.
-3. **Understanding is a build step, not a bonus.** T2 work is not "done" until a knowledge report
-   exists. T1 gets a 6-line note. T0 gets a sentence. There is no tier where the engineer is
-   expected to absorb nothing.
-4. **Nothing is claimed that was not observed.** Four labels — VERIFIED, TESTED, ASSUMED, GAP —
-   and the rule that green tests never upgrade a label.
-5. **Few, single-responsibility skills.** Four new skills, each with explicit Non-Goals that name
-   the skill that owns the adjacent job. No skill enumerates what another skill does.
-6. **Knowledge lives next to the code.** `.ai/knowledge/`, git-tracked, index-first, update-in-place.
+1. **One always-loaded rule file decides the process.** Modes, gates, artifact paths, evidence
+   labels, and the knowledge contract live in `AGENTS.md`. Commands and skills reference it
+   instead of restating it.
+2. **Effort tracks consequence, not file count.** T0/T1/T2 remain risk tiers; they map directly
+   to Lightweight/Standard/Full workflow modes.
+3. **Every mode has a distinct cost.** Lightweight has 0 gates, Standard 3, Full 4. The full
+   lifecycle is never forced on a trivial change.
+4. **Investigation is reviewable before decisions are made.** `scratchpad.md` holds evidence and
+   hypotheses; `plan.md` holds approved decisions; `tasks.md` holds the execution contract.
+5. **System behavior is designed before code.** `implementation-flows.md` connects approved
+   decisions and tasks to Mermaid flows, with verified and planned behavior explicitly labelled.
+6. **Understanding is a build step.** Standard/Full work is not complete until the feature
+   knowledge package exists. Full-flow documentation is visual, not text-only.
+7. **Nothing is claimed that was not observed.** VERIFIED, TESTED, ASSUMED, GAP remain the only
+   evidence labels. Green tests never upgrade a label.
+8. **Knowledge lives next to the code.** `.ai/knowledge/` is git-tracked, index-first, and updated
+   in place.
 
 ---
 
 ## 2. Layers
 
-```
+```text
 ┌──────────────────────────────────────────────────────────────────────┐
 │ LAYER 0 — AGENTS.md  (loaded every session)                          │
-│   tier table · gates · Do-Not list · evidence labels · knowledge map │
+│   modes · gates · artifact paths · evidence labels · knowledge map   │
 └───────────────┬──────────────────────────────────────────────────────┘
                 │ referenced by
 ┌───────────────▼──────────────────────────────────────────────────────┐
-│ LAYER 1 — COMMANDS (entry points, thin: sequence + output shape)      │
-│   /ai-workflow  /create-feature  /fix-bug  /review-implemented-files  │
-│   /explain-logic  /knowledge-report  /ownership-check                 │
+│ LAYER 1 — COMMANDS (entry points, thin: sequence + output shape)     │
+│   /ai-workflow  /create-feature  /fix-bug  /review-implemented-files │
+│   /review-plan  /knowledge-report  /ownership-check                  │
 └───────────────┬──────────────────────────────────────────────────────┘
                 │ loads
 ┌───────────────▼──────────────────────────────────────────────────────┐
 │ LAYER 2 — SKILLS (procedures, loaded on demand)                      │
 │                                                                      │
-│  INVESTIGATE                    TRANSFER                  VERIFY      │
-│  analyze-project-structure      map-critical-paths        stress-test- │
-│  trace-execution-flow           transfer-implementation-  implementation│
-│  locate-code-patterns             knowledge               verify-      │
-│  validate-architecture                                    ownership    │
+│  INVESTIGATE              DESIGN                 VERIFY               │
+│  analyze-project-structure design-implementation- map-critical-paths  │
+│  trace-execution-flow       flows                 stress-test-        │
+│  locate-code-patterns                             implementation      │
+│  validate-architecture                            verify-ownership     │
 │                                                                      │
+│  TRANSFER: transfer-implementation-knowledge                         │
 │  FIX: diagnose-bug-root-cause → apply-targeted-fix → verify-regression│
 └───────────────┬──────────────────────────────────────────────────────┘
                 │ writes
 ┌───────────────▼──────────────────────────────────────────────────────┐
-│ LAYER 3 — .ai/knowledge/  (per project, git-tracked)                 │
-│   index.md · critical-paths.md · features/<slug>.md                  │
-│   plans/<slug>.md · gotchas.md · adr/NNN-*.md · ownership/<slug>.md    │
+│ LAYER 3 — WORK + KNOWLEDGE                                           │
+│  .ai/work/<slug>/   scratchpad · plan · tasks · flows · review        │
+│  .ai/knowledge/     index · critical-paths · features/<slug>/ · …     │
 └──────────────────────────────────────────────────────────────────────┘
-
-Agents are orthogonal: they are *who* executes (feature-builder, code-reviewer,
-repo-index, bug-hunter, …), now all `mode: subagent`. Skills are *how*.
 ```
 
+Agents are orthogonal: they are *who* executes. Skills are *how*. The lifecycle is *when*.
+
 ---
 
-## 3. The tier model (the whole behavioural change in one table)
+## 3. Mode model
 
-| | T0 | T1 | T2 |
+| | Lightweight (T0) | Standard (T1) | Full Engineering (T2) |
 |---|---|---|---|
 | **Trigger** | ≤2 files, no critical surface | one module, 2–6 files | authz · money · tx boundary · migration · concurrency · idempotency · external contract · cache invalidation · state machine · deletion · cross-service · trust-boundary validation · crypto · >6 files / >1 module |
-| **Plan** | none | ≤6 lines inline | artifact ≤40 lines |
-| **Human stops** | 0 | 0 | 1 (after plan) |
-| **Verify** | typecheck + build | + targeted tests | + full suite + failure-mode pass |
-| **Knowledge** | 1 line | 6–10 line note | 9-section report + risk ranking |
-| **Ownership check** | no | on request | offered once |
+| **Investigation** | none | `scratchpad.md` | `scratchpad.md` |
+| **Gates** | 0 | 3 (G1–G3) | 4 (G1–G4) |
+| **Flows** | none | mandatory when behavior changes (compact) | mandatory (comprehensive) |
+| **Verification** | typecheck + build | + targeted tests | + full suite + stress pass |
+| **Knowledge** | 1 line | README + full-flow | all four package files |
+| **Ownership** | none | on request | offered once |
 
-Objective test: *if you cannot name a concrete trigger from the T2 column, it is T1.*
-
----
-
-## 4. Workflow integration — the 7 target phases, mapped
-
-| Mission phase | Where it lives now | What changed |
-|---|---|---|
-| 1. Requirement understanding | `/ai-workflow` Phase 0–1 · `/create-feature` Phase 1 | scope lock + re-tier point stated up front; ambiguity answered with one question, not five |
-| 2. Codebase investigation | `analyze-project-structure` → `trace-execution-flow` → `locate-code-patterns` | must name the reference implementation being copied; unknowns become plan risks |
-| 3. Architecture and planning | `/ai-workflow` Phase 2 (+ `templates/knowledge/plan.md`) | one artifact instead of three; rejected alternative mandatory |
-| 4. Implementation | `/ai-workflow` Phase 3 · `/create-feature` Phase 3 | stop conditions defined (contradiction, destructive step, new dependency, scope breach) |
-| 5. Verification | `/ai-workflow` Phase 4 + `stress-test-implementation` + `/review-implemented-files` | failure-mode surfaces and evidence labels replace "tests pass" |
-| 6. Knowledge transfer | `map-critical-paths` + `transfer-implementation-knowledge` | new; produces the Engineering Knowledge Report |
-| 7. Ownership check | `verify-ownership` + `/ownership-check` | new; scored, gap-listed, with 1–3 exercises |
-
-Nothing was removed from phases 1–5. What was removed is the requirement to produce three
-separate approval artifacts before touching code.
+Objective test: if you cannot name a concrete T2 trigger, the task is Standard. If it is ≤2 files
+with no critical surface and no new public interface, it is Lightweight.
 
 ---
 
-## 5. Before / after
+## 4. Lifecycle
 
-| Dimension | Before | After |
-|---|---|---|
-| Agents reachable | 7 of 32 declared | 27 subagents + 5 primaries, all declared ones reachable |
-| Global rules | 9.7 KB unfilled template | 8 KB operating contract with objective triggers |
-| Gates for a 2-file change | 3 hard stops + 3 artifacts | 0 |
-| Gates for a payment change | 3 (same as above) | 1, after a plan with invariants + failure modes |
-| Dangling instructions | 10 | 0 (templates created; checker enforces) |
-| Post-implementation artifact | none | knowledge report + risk ranking (T2), note (T1) |
-| Correctness claim | "tests pass" | VERIFIED / TESTED / ASSUMED / GAP, quoted commands |
-| Failure analysis | none | 10 surfaces, evidence-labelled, time-boxed probes |
-| Understanding check | generic Socratic mentor | 5-level questions from the real diff, hidden key, scored bands |
-| Knowledge store | none | `.ai/knowledge/` with index, gotcha ledger, ADR format |
-| Source of truth | two diverged trees, no git | one git repo + `install.sh` + `verify.py` parity check |
-| Answer to "what am I running?" | unknown | `opencode debug skill` / `agent list` / `verify.py` |
+```text
+CLASSIFY
+  → INVESTIGATE → scratchpad.md → GATE 1
+  → PLAN        → plan.md       → GATE 2
+  → TASKS       → tasks.md      → GATE 3
+  → FLOWS       → implementation-flows.md
+  → IMPLEMENT → VERIFY
+  → GATE 4 (Full; Standard on deviation) → KNOWLEDGE → COMPLETE
+```
+
+Gate semantics:
+
+| Gate | Freezes | What must be explicit |
+|------|---------|-----------------------|
+| G1 | Scope | Findings, evidence, assumptions, risks |
+| G2 | Plan baseline | Decisions, alternatives, invariants, verification |
+| G3 | Execution plan | Tasks, dependencies, order, risk |
+| G4 | Completion | Results, evidence, deviations, updated flows, remaining risks |
+
+Approval is explicit; silence is not approval; one gate never implies the next.
 
 ---
 
-## 6. Files
+## 5. Artifact contract
 
-### New (12)
-| File | Purpose |
+| Artifact | Location | Owner | Purpose |
+|---|---|---|---|
+| `scratchpad.md` | `.ai/work/<slug>/` | investigation | Evidence, hypotheses, unknowns; no decisions |
+| `plan.md` | `.ai/work/<slug>/` | planning | Approved engineering decisions and invariants |
+| `tasks.md` | `.ai/work/<slug>/` | planning | Reviewable execution contract |
+| `implementation-flows.md` | `.ai/work/<slug>/` | `design-implementation-flows` | Pre-code visual system behavior |
+| `review.md` | `.ai/work/<slug>/` | review | Gate 4 evidence and deviations |
+| feature package | `.ai/knowledge/features/<slug>/` | `transfer-implementation-knowledge` | Durable visual knowledge |
+
+Legacy `features/<slug>.md` and `plans/<slug>.md` remain readable. New work does not write them.
+
+---
+
+## 6. Visual documentation
+
+`implementation-flows.md` and `full-flow.md` use Mermaid as the primary format:
+
+| Diagram | Use for |
 |---|---|
-| `AGENTS.md` | operating contract (tiering, gates, labels, knowledge map) |
-| `skills/map-critical-paths/SKILL.md` | 9-dimension risk ranking + promotion rule |
-| `skills/transfer-implementation-knowledge/SKILL.md` | 9-section report, ≤120 lines, ≤3 "understand deeply" |
-| `skills/stress-test-implementation/SKILL.md` | 10 failure surfaces, 4 evidence labels, probe recipes |
-| `skills/verify-ownership/SKILL.md` | 5-level questions, hidden key, 0/1/2 scoring, exercise types |
-| `commands/knowledge-report.md` | `/knowledge-report` entry point |
-| `commands/ownership-check.md` | `/ownership-check` entry point |
-| `templates/knowledge/{README,index,feature,critical-paths,gotchas,adr-template}.md` | the `.ai/knowledge/` contract |
-| `scripts/install.sh` | additive install with backup |
-| `scripts/verify.py` | schema, references, gate policy, install parity |
-| `scripts/normalize.py` | frontmatter migration (idempotent) |
-| `scripts/migrate-gates.py` · `scripts/align-text.py` | one-off migrations, kept for provenance |
+| Flowchart | Business logic and execution paths |
+| Sequence | API calls, services, async, external integrations |
+| State | State transitions and lifecycle |
+| ER | Data relationships and schema |
+| Architecture | Component boundaries and dependencies |
 
-### Rewritten (4)
-`commands/ai-workflow.md` · `commands/create-feature.md` ·
-`commands/review-implemented-files.md` · `commands/explain-logic.md`
+Every diagram element is labelled `[V]` verified existing behavior with `file:line`, `[P]` planned
+behavior with a task ID, or `[?]` unknown. Diagrams include failure and alternative paths for
+Full work. Mermaid source stays inside Markdown.
 
-### Mechanically migrated (11 commands, 25 agents, 7 skills)
-Gate chains removed from: `add-api-integration`, `add-tests`, `daily-system-boot`, `deep-dive`,
-`fix-bug`, `get-docs`, `optimize-performance`, `refactor-feature`, `review-architecture`,
-`review-pr`, `update-docs`. Agents: `skills:`/`boundaries:` moved into the body, `mode: subagent`
-added. Skills: `category`/`inputs`/`outputs` → `metadata`.
-
-### Created to close F7 (7)
-`prompts/templates/{scratchpad,plan,tasks,reflection,review-output,review-plan,review-implementation}.md`
-
-### Retired (5)
-`_retired/AGENTS-old-template.md`, `_retired/commands/{ai-workflow,create-feature,explain-logic,review-implemented-files}.md`
-— kept on disk for diffing, excluded from validation and install.
+`full-flow.md` is the first document a maintainer reads. It must cover the complete lifecycle,
+critical decision points, source mapping, production debugging, and an ownership checklist.
 
 ---
 
-## 7. Why four skills and not twelve
+## 7. Risk-based review
 
-Each new skill owns one question and refuses the adjacent ones in writing:
+| Tier | Diagrams | Review depth | Stress pass | Ownership |
+|---|---|---|---|---|
+| A | Flowchart + sequence/state | All dimensions, hand-trace, concurrency, rollback | Mandatory | Level 3 |
+| B | Flowchart if material | Correctness, bugs, security, architecture, tests | If write/state/external | Level 2 |
+| C | None | Correctness and conventions | Lightweight | Level 1 |
 
-| Skill | Answers | Explicitly refuses |
+High-risk paths are transactions, concurrency, authz, security, data consistency, external
+integrations, and critical business invariants. They get deeper verification and diagrams that
+explain the execution path. Boilerplate does not.
+
+---
+
+## 8. Skill map
+
+| Skill | Owns | Explicitly refuses |
 |---|---|---|
-| `map-critical-paths` | *where should attention go?* | fixing, benchmarking, explaining, reviewing |
-| `transfer-implementation-knowledge` | *what must I understand about this change?* | grading code, restating the plan, teaching frameworks |
-| `stress-test-implementation` | *what happens when the world misbehaves?* | rewriting, certifying correctness, security audit |
-| `verify-ownership` | *can I maintain this without AI?* | capability judgements, interview prep, whole-repo scope |
+| `design-implementation-flows` | What will the system do before code exists? | implementation, review, durable knowledge |
+| `transfer-implementation-knowledge` | What must I understand after the change? | grading code, restating the plan, teaching frameworks |
+| `map-critical-paths` | Where should attention go? | fixing, benchmarking, explaining, reviewing |
+| `stress-test-implementation` | What happens when the world misbehaves? | rewriting, certifying correctness, security audit |
+| `verify-ownership` | Can I maintain this without AI? | capability judgements, interview prep, whole-repo scope |
 
-The alternative — one "engineering excellence" skill — is how the original system ended up with
-`deep-research` and `deep-research-agent`, and with three code reviewers.
+One new skill was added because pre-code flow design is a distinct stage from post-code knowledge
+transfer. Extending `trace-execution-flow` was rejected: it would conflate verified existing
+behavior with planned behavior.
+
+---
+
+## 9. Validation
+
+- `scripts/verify.py` checks schema, references, the workflow contract, Mermaid templates, stale
+  plan paths, gate policy, config safety, and install parity.
+- `opencode debug skill` proves which skills actually loaded.
+- `docs/VALIDATION.md` records the audit, install, and the three workflow simulations.
+
+---
+
+## 10. Compatibility
+
+- OpenCode 1.19.5; no new config keys.
+- `opencode.json` is unchanged; the permission matrix remains the strongest safety control.
+- Existing agents, commands, skills, and knowledge files are preserved or updated in place.
+- `scripts/install.sh` is additive and backs up overwritten files.

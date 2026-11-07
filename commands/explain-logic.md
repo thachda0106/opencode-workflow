@@ -69,8 +69,9 @@ Rules:
 ## 4. Optional persistence
 
 If the path is Tier A (load `map-critical-paths` if unsure), append it to
-`.ai/knowledge/features/<slug>.md` under `## Path` — the same content, not a second version.
-Otherwise leave it in chat; not every explanation deserves a file.
+`.ai/knowledge/features/<slug>/full-flow.md` under `## Path` — the same content, not a second
+version. If only a legacy `.ai/knowledge/features/<slug>.md` report exists, update that instead
+of creating a package. Otherwise leave it in chat; not every explanation deserves a file.
 
 ## Non-goals
 

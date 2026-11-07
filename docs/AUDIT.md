@@ -170,3 +170,47 @@ silent about what was learned.**
 | Medium | F8, F9, F10 | invalid agent schema, orphaned context, duplicated responsibilities, two drifted trees |
 
 Full remediation and validation: `docs/ARCHITECTURE.md`, `docs/VALIDATION.md`.
+
+---
+
+## 6. Engineering Ownership Workflow audit — 2026-11-07
+
+Audited: `AGENTS.md`, 14 skills, 25 commands, 25 agents, prompt/knowledge templates, `docs/`,
+`.ai/knowledge/`, `scripts/`, `opencode.json`. Baseline: `python scripts/verify.py` → 10 pass,
+0 warn, 0 fail; OpenCode 1.19.5; repo and global `AGENTS.md` identical.
+
+### Findings
+
+| # | Finding | Evidence | Impact |
+|---|---------|----------|--------|
+| G1 | No explicit Lightweight/Standard/Full mode routing | `AGENTS.md` §1–2; T0/T1/T2 were risk tiers only | Artifact and gate set could not be selected consistently |
+| G2 | Only one gate, after the T2 plan | `AGENTS.md` §2; `/ai-workflow` Phase 2 | No Gate 1 (findings), Gate 3 (execution), or Gate 4 (final review) |
+| G3 | Investigation and plan collapsed into one file | `prompts/templates/scratchpad.md`; `/ai-workflow` wrote the plan directly | Observations and conclusions were not separately reviewable |
+| G4 | No `tasks.md` artifact | `/ai-workflow` Phase 2: "the plan's step list is the task list" | No task IDs, dependencies, acceptance criteria, or context recovery |
+| G5 | No implementation-flow stage | No Mermaid or pre-code flow artifact in skills/templates | Code could start without a visual model of intended behavior |
+| G6 | No Mermaid requirements | No `mermaid` block in any skill/template | Knowledge reports were text-only |
+| G7 | Single-file feature report | `transfer-implementation-knowledge` wrote `features/<slug>.md` | No README/full-flow/architecture/decisions package |
+| G8 | No progressive Level 1/2/3 model | Transfer skill had "understand more deeply" only | Ownership depth was not prioritized by risk |
+| G9 | No context-recovery procedure | No persisted task status or checkpoint verification | Interrupted sessions relied on chat memory |
+| G10 | Review depth not tied to diagrams | `map-critical-paths` ranked paths; review did not require flows | Tier A paths could pass without sequence/state diagrams |
+| G11 | `verify.py` capped hard stops at 1 | `scripts/verify.py` `check_commands` | New mode-specific gates needed a contract change |
+| G12 | 10+ commands referenced the legacy plan path | grep across `commands/` | Artifact paths would diverge |
+| G13 | `context/BOUNDARIES.md` retained the retired 3-gate model | grep for `SCRATCHPAD.md`/`PLAN.md`/`TASKS.md` | Orphaned but conflicting if copied into a project |
+
+### Remediation
+
+Implemented in the same change:
+
+- `AGENTS.md`: modes, four gates, `.ai/work/<slug>/`, implementation flows, Level 1–3 ownership,
+  context recovery, updated knowledge package contract.
+- `design-implementation-flows` skill: pre-code Mermaid design with `[V]`/`[P]`/`[?]` labels.
+- `transfer-implementation-knowledge`: package output (`README`, `full-flow`, `architecture`,
+  `decisions`).
+- `map-critical-paths`, `stress-test-implementation`, `verify-ownership`: flow priority, flow
+  reconciliation, and Level 1–3 mapping.
+- Commands rewritten for the new lifecycle; legacy plan paths updated.
+- Templates: scratchpad, plan, tasks, implementation flows, review, and knowledge package.
+- `verify.py`: workflow contract, Mermaid, stale-path, and gate checks.
+
+Preserved: T0/T1/T2 triggers, evidence labels, existing skills and commands, existing knowledge
+files, permission matrix, install/verify scripts.

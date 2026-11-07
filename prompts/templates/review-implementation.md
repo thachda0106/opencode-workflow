@@ -1,10 +1,12 @@
-# Template — implementation review
+# Template — implementation review / Gate 4 evidence
 
-Matches the output of `/review-implemented-files`. Write to `review-implementation.md`.
+> Target: `.ai/work/<slug>/review.md` for a gated change; otherwise `review-implementation.md`
+> at repo root (or `docs/reviews/<date>-<slug>.md`).
 
 # Review — <change>
 
-Tier: <A/B/C per path> · Scope: <n> files · Base: <branch/commit>
+Mode: <Lightweight | Standard | Full Engineering> · Tier: <A/B/C per path>
+Scope: <n> files · Base: <branch/commit>
 Verdict: APPROVED | APPROVED_WITH_COMMENTS | CHANGES_REQUESTED
 
 ## Findings
@@ -12,25 +14,54 @@ Verdict: APPROVED | APPROVED_WITH_COMMENTS | CHANGES_REQUESTED
 | # | Severity | Evidence | File:line | Finding | Why it matters |
 |---|----------|----------|-----------|---------|----------------|
 
-## Dimensions checked
+Severity: MUST_FIX | SHOULD_FIX | OPTIONAL
+Evidence: CONFIRMED | LIKELY | QUESTION
 
-| Dimension | Result | Notes |
-|-----------|--------|-------|
-| Correctness | pass / findings / n-a | |
-| Bugs (races, leaks, bounds) | | |
-| Security | | |
-| Architecture | | |
-| Performance | | |
-| Error handling | | |
-| Tests | | |
+## Plan / task / flow compliance
+
+| Item | Status | Evidence |
+|------|--------|----------|
+| Plan decisions D1–Dn implemented | pass/fail | |
+| Invariants INV1–INVn hold | pass/fail | |
+| Every approved task implemented or deferred | pass/fail | |
+| Implementation flows match code | pass/fail | |
+| Diagrams updated `[P]` → `[V]` where verified | pass/fail | |
+
+## Deviations
+
+| Planned | Actual | Reason | Approved? |
+|---------|--------|--------|-----------|
+
+## Verification evidence
+
+| Check | Command | Result |
+|-------|---------|--------|
 
 ## What tests actually cover
 
+| Scenario | Test |
+|----------|------|
+
 ## What is assumed, not verified
+
+-
+
+## Remaining risks
+
+| Risk | Impact | Mitigation / follow-up |
+|------|--------|------------------------|
 
 ## Questions for the author
 
-## Follow-ups
+-
 
-| Item | Owner | Trigger |
-|------|-------|---------|
+## Gate 4 decision
+
+- [ ] Results reviewed
+- [ ] Verification evidence reviewed
+- [ ] Deviations accepted or rejected
+- [ ] Flows updated
+- [ ] Knowledge links present
+- [ ] Remaining risks accepted
+
+Approved: `APPROVE GATE 4` · Date: <YYYY-MM-DD>

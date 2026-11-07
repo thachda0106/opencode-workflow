@@ -6,9 +6,8 @@ subtask: false
 
 # Optimize Performance
 
-> **Gates**: this command follows the tier model in `AGENTS.md`. T0/T1 run with no stops;
-> T2 stops once, after the plan. Investigation notes, plan, and step list all live in
-> `.ai/knowledge/plans/<slug>.md` — not in three root-level files.
+> **Modes and gates**: follow the mode table in `AGENTS.md`. Lightweight runs with no stops;
+> Standard uses Gates 1–3; Full uses Gates 1–4. Work artifacts live under `.ai/work/<slug>/`.
 
 Identify and fix performance bottlenecks using evidence-based analysis.
 
@@ -32,7 +31,7 @@ Identify and fix performance bottlenecks using evidence-based analysis.
    - **I/O**: Synchronous file operations, unbatched network calls
    - **Memory**: Memory leaks, excessive object creation, missing cleanup
    - **Concurrency**: Blocking main thread, incorrect async patterns
-4. Write all findings into `.ai/knowledge/plans/<slug>.md`
+4. Write all findings into `.ai/work/<slug>/plan.md`
 
 ---
 
@@ -43,7 +42,7 @@ Identify and fix performance bottlenecks using evidence-based analysis.
    - Proposed solution (prefer simple: add index, batch queries)
    - Before/after expected metrics
    - Risk of regression
-2. Write into `.ai/knowledge/plans/<slug>.md`
+2. Write into `.ai/work/<slug>/plan.md`
 
 ---
 
@@ -53,7 +52,7 @@ Identify and fix performance bottlenecks using evidence-based analysis.
    - [ ] Step 1: Description + files to change
    - [ ] Step 2: Description + files to change
    - [ ] Step N: Add benchmark / regression test
-2. Write into `.ai/knowledge/plans/<slug>.md`
+2. Write into `.ai/work/<slug>/plan.md`
 
 ---
 

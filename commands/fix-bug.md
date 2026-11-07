@@ -1,96 +1,103 @@
 ---
-description: Systematically diagnose and fix bugs in the codebase
+description: Systematically diagnose and fix bugs through the engineering-ownership lifecycle — mode routing, root-cause evidence, gated fix plan, verification
 agent: bug-hunter
 subtask: false
 ---
 
 # Fix Bug
 
-> **Gates**: this command follows the tier model in `AGENTS.md`. T0/T1 run with no stops;
-> T2 stops once, after the plan. Investigation notes, plan, and step list all live in
-> `.ai/knowledge/plans/<slug>.md` — not in three root-level files.
+Diagnose first; fix only after the cause is evidence-backed. The mode table and gate rules live in
+`AGENTS.md`.
 
-Systematically diagnose and fix bugs following the Bug Hunter agent protocol.
+## 0 · CLASSIFY
 
----
+Bug to diagnose: **$ARGUMENTS** (if empty, ask for the symptom and stop).
 
-## 1 · INVESTIGATE — Diagnosis
+```
+Mode: Standard (T1) — trigger: one module, 4 files, no critical surface
+Scope lock: src/orders/**; not touching payments.
+Re-tier point: the fix needs a migration or touches authz.
+```
 
-The bug to diagnose: **$ARGUMENTS** (if empty, ask for the symptom and stop).
+- Lightweight (T0): ≤2 files, localized, no critical surface → direct fix, verify, one-line note.
+- Standard (T1): one module, 2–6 files → Gates 1–3.
+- Full (T2): authz, money, transaction, migration, concurrency, external contract, >6 files, or
+  >1 module → Gates 1–4.
 
-**No code changes in this phase. Investigation only.**
+## 1 · INVESTIGATE
 
-1. Read the bug description/error message carefully
-2. Identify affected functionality
-3. Determine reproduction steps
-4. Check if it's a regression (did it work before?)
-5. Use error stack trace to find source
-6. Search for relevant code patterns
-7. Check related modules and layers
-8. Review recent changes (`git blame`/`git log`)
-9. Diagnose root cause — categorize the bug:
-   - **Request Lifecycle**: Middleware, guard failures, interceptor problems
-   - **Dependency Injection**: Missing providers, circular dependencies
-   - **Database/ORM**: Query errors, mapping issues, migration problems
-   - **Type Errors**: Type mismatches, null/undefined, incorrect assertions
-   - **Async Issues**: Unhandled promises, race conditions
-   - **Validation**: Incorrect validation, missing checks
-   - **API/Data**: Wrong endpoint, incorrect format, missing error handling
-10. Write all findings into `.ai/knowledge/plans/<slug>.md` including:
-    - **Symptom**: What's wrong
-    - **Root Cause**: Why it's happening
-    - **Impact**: What's affected
+No code changes in this phase.
 
----
+1. Read the bug description/error message carefully.
+2. Identify affected functionality and reproduction steps.
+3. Check whether it is a regression (`git blame` / `git log`).
+4. Use the stack trace to find the source, or trace forward from the entry point.
+5. Search for relevant code patterns and related modules/layers.
+6. Diagnose the root cause — categorize it:
+   - Request lifecycle: middleware, guards, interceptors.
+   - Dependency injection: missing providers, circular dependencies.
+   - Database/ORM: query errors, mapping, migration problems.
+   - Types: mismatches, null/undefined, incorrect assertions.
+   - Async: unhandled promises, race conditions.
+   - Validation: missing or incorrect checks.
+   - API/data: wrong endpoint, format, or error handling.
+7. Separate observation from hypothesis. Cite `file:line` for observations.
+8. Write findings to `.ai/work/<slug>/scratchpad.md`: symptom, evidence, root cause, impact,
+   assumptions, open questions, alternatives considered.
 
-## 2 · PLAN — Fix Strategy
+**Lightweight:** use a short inline investigation; no artifact. If the cause is not evidence-backed,
+promote to Standard.
 
-1. Based on the diagnosis in the plan file, plan the fix:
-   - Minimal change needed
-   - Side effects and edge cases
-   - Files to modify
-   - Risk of breaking other features
-   - Verification strategy
-2. Document:
-   - **Approach**: How to fix it
-   - **Changes**: What code will change
-   - **Trade-offs**: Any considerations
-3. Write into `.ai/knowledge/plans/<slug>.md`
+**GATE 1 — Standard/Full.** Present findings, evidence, assumptions, risks, scope. Require
+`APPROVE GATE 1`.
 
----
+## 2 · PLAN
 
-## 3 · STEPS — Fix Steps
+Write `.ai/work/<slug>/plan.md`: minimal change, side effects, edge cases, files, risk of breaking
+other features, verification strategy, rollback, rejected alternative, non-goals, acceptance
+criteria.
 
-1. Break the fix into ordered steps:
-   - [ ] Step 1: Description + files to change
-   - [ ] Step 2: Description + files to change
-   - [ ] Step N: Add regression test
-2. For each step, specify:
-   - What changes
-   - Why
-   - Expected result
-3. Write into `.ai/knowledge/plans/<slug>.md`
+**GATE 2 — Standard/Full.** Present decisions and trade-offs. Require `APPROVE GATE 2`.
 
----
+## 3 · TASKS
 
-## 4 · IMPLEMENT — Apply Fix
+Write `.ai/work/<slug>/tasks.md`: ordered fix steps, regression test, acceptance criteria,
+verification command, risk, plan-decision reference. Every step is independently checkable.
 
-- Make targeted changes (avoid over-engineering)
-- Add defensive checks if needed
-- Update types if necessary
-- Add comments for non-obvious fixes
-- Implement in the order defined in `.ai/knowledge/plans/<slug>.md`
+**GATE 3 — Standard/Full.** Present tasks, dependencies, order, risk. Require `APPROVE GATE 3`.
 
----
+## 4 · IMPLEMENTATION FLOWS
 
-## 5 · VERIFY
+Mandatory for Full. Mandatory for Standard when the fix changes runtime behavior; use a compact
+flow showing the failing path before the fix and the corrected path after it. Skip only for a pure
+rename or non-behavioral change, and state why.
 
-After the fix is implemented:
-- Test the specific bug scenario
-- Test related functionality
-- Run unit/integration tests
-- Check for new type errors
-- Verify no regressions
+Load `design-implementation-flows` and write `.ai/work/<slug>/implementation-flows.md`. No source
+changes before it exists.
 
-### Prevention
-- Document how to avoid similar bugs in the future
+## 5 · IMPLEMENT
+
+- Make targeted changes only.
+- Match existing code style and patterns.
+- Add a regression test that fails before the fix and passes after it.
+- Update callers if a signature changes.
+- No unrelated refactoring, formatting sweeps, or dependency bumps.
+
+## 6 · VERIFY
+
+- Reproduce the original bug scenario; confirm it is fixed.
+- Run the regression test.
+- Run targeted tests, then the project's typecheck/lint/build.
+- Full mode: full suite + `stress-test-implementation`.
+- Report `not run` for anything that could not run; never report it as passed.
+
+## 7 · REVIEW AND KNOWLEDGE
+
+- Standard: final summary with verification evidence, deviations, remaining risks.
+- Full: write `.ai/work/<slug>/review.md`; wait for `APPROVE GATE 4`.
+- Standard knowledge: `.ai/knowledge/features/<slug>/README.md` + `full-flow.md` when behavior
+  changed; otherwise a short note.
+- Full knowledge: all four package files.
+- Add a gotcha to `.ai/knowledge/gotchas.md` if diagnosis took >15 minutes.
+
+End with the completion block from `/ai-workflow`.

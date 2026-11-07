@@ -5,15 +5,15 @@ at the start of every session that touches this project.
 
 ## Features
 
-<!-- features/<slug>.md · YYYY-MM-DD · <one-phrase purpose> -->
+<!-- features/<slug>/README.md · YYYY-MM-DD · <one-phrase purpose> -->
 
 ## Critical paths
 
 <!-- critical-paths.md · YYYY-MM-DD · <modules covered> -->
 
-## Plans
+## Work artifacts
 
-<!-- plans/<slug>.md · YYYY-MM-DD · <shipped | abandoned | in progress> -->
+<!-- .ai/work/<slug>/plan.md · YYYY-MM-DD · <shipped | abandoned | in progress> -->
 
 ## Decisions
 

@@ -6,9 +6,8 @@ subtask: false
 
 # Update Documentation
 
-> **Gates**: this command follows the tier model in `AGENTS.md`. T0/T1 run with no stops;
-> T2 stops once, after the plan. Investigation notes, plan, and step list all live in
-> `.ai/knowledge/plans/<slug>.md` — not in three root-level files.
+> **Modes and gates**: follow the mode table in `AGENTS.md`. Lightweight runs with no stops;
+> Standard uses Gates 1–3; Full uses Gates 1–4. Work artifacts live under `.ai/work/<slug>/`.
 
 Update project documentation to match the current codebase state.
 
@@ -27,7 +26,7 @@ Update project documentation to match the current codebase state.
 2. Read current code structure and patterns
 3. Compare with existing documentation
 4. Identify gaps, inaccuracies, or outdated sections
-5. Write findings into `.ai/knowledge/plans/<slug>.md`:
+5. Write findings into `.ai/work/<slug>/plan.md`:
    - Docs that need updating
    - Gaps found
    - Inaccuracies found
@@ -40,7 +39,7 @@ Update project documentation to match the current codebase state.
    - Files to modify
    - Sections to add, update, or remove
    - Priority (critical inaccuracies first)
-2. Write into `.ai/knowledge/plans/<slug>.md`
+2. Write into `.ai/work/<slug>/plan.md`
 
 ---
 
@@ -52,13 +51,13 @@ Update project documentation to match the current codebase state.
    - [ ] Step 3: Remove references to deleted features
    - [ ] Step 4: Update code examples
    - [ ] Step 5: Verify all file paths referenced exist
-2. Write into `.ai/knowledge/plans/<slug>.md`
+2. Write into `.ai/work/<slug>/plan.md`
 
 ---
 
 ## 4 · IMPLEMENT
 
-- Update documentation per `.ai/knowledge/plans/<slug>.md`
+- Update documentation per `.ai/work/<slug>/plan.md`
 - Do NOT modify production code — documentation only
 - If code needs fixing, escalate to Bug Hunter or Feature Builder
 - Keep documentation concise and actionable
